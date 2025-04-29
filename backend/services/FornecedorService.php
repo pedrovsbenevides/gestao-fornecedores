@@ -31,4 +31,16 @@ class FornecedorService implements FornecedorContract
             throw $th;
         }
     }
+
+    public function getAll(): array
+    {
+
+        try {
+            $fornecedores = $this->repo->getAll();
+
+            return $fornecedores;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
 }

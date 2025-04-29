@@ -8,4 +8,6 @@ interface FornecedorContract
 {
 
     public function create(array $data): Fornecedor;
+
+    public function getAll(): array;
 }

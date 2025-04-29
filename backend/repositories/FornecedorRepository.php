@@ -43,13 +43,21 @@ class FornecedorRepository
     public function getByDemanda(int $demandaId)
     {
         $selectStatement = $this->pdo->prepare('
-            SELECT fornecedores.id, fornecedores.razao_social, fornecedores.cep 
+            SELECT fornecedores.id, fornecedores.razao_social, fornecedores.cep, demandas_fornecedores.created_at
             FROM fornecedores
             INNER JOIN demandas_fornecedores ON fornecedores.id = demandas_fornecedores.fornecedor_id
             WHERE demandas_fornecedores.demanda_id = :demandaId
         ');
 
         $selectStatement->bindParam(':demandaId', $demandaId);
+        $selectStatement->execute();
+
+        return $selectStatement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAll()
+    {
+        $selectStatement = $this->pdo->prepare('SELECT * FROM fornecedores');
         $selectStatement->execute();
 
         return $selectStatement->fetchAll(PDO::FETCH_ASSOC);
