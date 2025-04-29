@@ -49,4 +49,15 @@ class DemandaController
             return ResponseHelper::error($th->getMessage());
         }
     }
+
+    public function getAll()
+    {
+        try {
+            $response = $this->service->listDemandasFornecedores();
+
+            return ResponseHelper::success($response);
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage());
+        }
+    }
 }
