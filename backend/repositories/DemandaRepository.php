@@ -40,6 +40,14 @@ class DemandaRepository
         }
     }
 
+    public function getAll()
+    {
+        $selectStatement = $this->pdo->prepare('SELECT * FROM demandas');
+        $selectStatement->execute();
+
+        return $selectStatement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     private function buildDemanda(int $id, array $data): Demanda
     {
 
