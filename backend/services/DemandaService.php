@@ -60,38 +60,55 @@ class DemandaService implements DemandaContract
         }
     }
 
-    public function listDemandasFornecedores()
+    public function listDemandasFornecedores(): array
     {
-        $demandas = $this->repo->getAll();
+        try {
 
-        foreach ($demandas as &$demanda) {
+            $demandas = $this->repo->getAll();
 
-            $fornecedores = $this->fornecedorRepo->getByDemanda($demanda['id']);
+            foreach ($demandas as &$demanda) {
 
-            foreach ($fornecedores as &$fornecedor) {
-                $fornecedor['distancia_demanda'] = GeoHelper::CalculateDistance($demanda['cep'], $fornecedor['cep']);
+                $fornecedores = $this->fornecedorRepo->getByDemanda($demanda['id']);
+
+                foreach ($fornecedores as &$fornecedor) {
+                    $fornecedor['distancia_demanda'] = GeoHelper::CalculateDistance($demanda['cep'], $fornecedor['cep']);
+                }
+
+                $distanceGroup = [];
+                foreach ($fornecedores as &$fornecedor) {
+                    $dist = $fornecedor['distancia_demanda'];
+                    $distanceGroup[$dist][] = $fornecedor;
+                }
+
+                $listFornecedores = [];
+                $seed = time() % 1000;
+                foreach (array_keys($distanceGroup) as $distancia) {
+                    $fornecedoresGroup = $distanceGroup[$distancia];
+                    $roundRobinPosition = $seed % count($fornecedoresGroup);
+                    $roundedGroup = array_merge(array_slice($fornecedoresGroup, $roundRobinPosition), array_slice($fornecedoresGroup, 0, $roundRobinPosition));
+                    $listFornecedores = array_merge($listFornecedores, $roundedGroup);
+                }
+
+                usort($listFornecedores, fn($a, $b) => $a['distancia_demanda'] <=> $b['distancia_demanda']);
+
+                $demanda['fornecedores'] = $listFornecedores;
             }
 
-            $distanceGroup = [];
-            foreach ($fornecedores as &$fornecedor) {
-                $dist = $fornecedor['distancia_demanda'];
-                $distanceGroup[$dist][] = $fornecedor;
-            }
-
-            $listFornecedores = [];
-            $seed = time() % 1000;
-            foreach (array_keys($distanceGroup) as $distancia) {
-                $fornecedoresGroup = $distanceGroup[$distancia];
-                $roundRobinPosition = $seed % count($fornecedoresGroup);
-                $roundedGroup = array_merge(array_slice($fornecedoresGroup, $roundRobinPosition), array_slice($fornecedoresGroup, 0, $roundRobinPosition));
-                $listFornecedores = array_merge($listFornecedores, $roundedGroup);
-            }
-
-            usort($listFornecedores, fn($a, $b) => $a['distancia_demanda'] <=> $b['distancia_demanda']);
-
-            $demanda['fornecedores'] = $listFornecedores;
+            return $demandas;
+        } catch (\Throwable $th) {
+            throw $th;
         }
+    }
 
-        return $demandas;
+    public function getAll(): array
+    {
+
+        try {
+            $demandas = $this->repo->getAll();
+
+            return $demandas;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }

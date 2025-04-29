@@ -15,7 +15,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 $controller = new DemandaController();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $controller->getAllWithFornecedores();
+    $controller->getAll();
 } else {
     return ResponseHelper::notAllowed();
 }

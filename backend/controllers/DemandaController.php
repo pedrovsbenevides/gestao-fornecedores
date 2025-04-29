@@ -50,10 +50,21 @@ class DemandaController
         }
     }
 
-    public function getAll()
+    public function getAllWithFornecedores()
     {
         try {
             $response = $this->service->listDemandasFornecedores();
+
+            return ResponseHelper::success($response);
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage());
+        }
+    }
+
+    public function getAll()
+    {
+        try {
+            $response = $this->service->getAll();
 
             return ResponseHelper::success($response);
         } catch (\Throwable $th) {
