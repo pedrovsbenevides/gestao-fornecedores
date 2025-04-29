@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Atribuição de Fornecedores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .fornecedores {
+            margin: 10px 0;
+        }
+
+        .fornecedor-item {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Atribuir Fornecedores à Demanda</h1>
+
+    <form id="formAssociacao">
+        <label for="demandaSelect">Escolha a Demanda:</label>
+        <select id="demandaSelect" name="demanda_id" required></select>
+
+        <div class="fornecedores" id="fornecedoresContainer">
+            <p><strong>Selecione os Fornecedores:</strong></p>
+        </div>
+
+        <button type="submit">Atribuir</button>
+    </form>
+
+    <br>
+
+    <a href="classificacao.html">
+        <button>Ver Classificação</button>
+    </a>
+
+    <script>
+        async function carregarSelects() {
+            const demandas = await fetch('http://localhost:8000/routes/listDemandas.php').then(r => r.json());
+            const fornecedores = await fetch('http://localhost:8000/routes/listFornecedores.php').then(r => r.json());
+
+            const demandaSelect = document.getElementById('demandaSelect');
+            const fornecedoresContainer = document.getElementById('fornecedoresContainer');
+
+            demandas.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.textContent = `${d.titulo} (${d.cep})`;
+                demandaSelect.appendChild(opt);
+            });
+
+            fornecedores.forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'fornecedor-item';
+                div.innerHTML = `
+          <label>
+            <input type="checkbox" name="fornecedor_ids[]" value="${f.id}">
+            ${f.razao_social} (${f.cep})
+          </label>
+        `;
+                fornecedoresContainer.appendChild(div);
+            });
+        }
+
+        document.getElementById('formAssociacao').onsubmit = async (e) => {
+            e.preventDefault();
+
+            const demandaId = document.getElementById('demandaSelect').value;
+            const fornecedoresSelecionados = Array.from(document.querySelectorAll('input[name="fornecedor_ids[]"]:checked'))
+                .map(input => parseInt(input.value));
+
+            if (fornecedoresSelecionados.length === 0) {
+                alert('Selecione pelo menos um fornecedor!');
+                return;
+            }
+
+            const formData = {
+                demanda_id: parseInt(demandaId),
+                fornecedores_ids: fornecedoresSelecionados
+            };
+
+            let response = await fetch('http://localhost:8000/routes/associacaoFornecedores.php', {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            });
+
+            if (response.status == 200) {
+
+                alert('Fornecedores associados com sucesso!');
+            } else {
+                alert(response.json.error);
+            }
+            e.target.reset();
+        };
+
+        carregarSelects();
+    </script>
+
+</body>
+
+</html>
