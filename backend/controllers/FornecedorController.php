@@ -33,4 +33,15 @@ class FornecedorController
             return ResponseHelper::error($th->getMessage());
         }
     }
+
+    public function getAll()
+    {
+        try {
+            $response = $this->service->getAll();
+
+            return ResponseHelper::success($response);
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage());
+        }
+    }
 }
