@@ -33,4 +33,20 @@ class DemandaController
             return ResponseHelper::error($th->getMessage());
         }
     }
+
+    public function assocFornecedores()
+    {
+        try {
+            $request = json_decode(file_get_contents('php://input'), true);
+
+            if (empty($request['demanda_id']) || empty($request['fornecedores_ids'])) {
+                return ResponseHelper::error('Demanda e Fornecedores são obrigatórios.');
+            }
+
+            $response = $this->service->assocFornecedores($request);
+            return ResponseHelper::success($response);
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage());
+        }
+    }
 }
