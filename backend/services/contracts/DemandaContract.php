@@ -8,4 +8,6 @@ interface DemandaContract
 {
 
     public function create(array $data): Demanda;
+
+    public function assocFornecedores(array $data);
 }
