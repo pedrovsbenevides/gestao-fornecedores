@@ -1,6 +1,8 @@
 <?php
 require_once dirname(dirname(__FILE__)) . '\config\connection.php';
 
+use backend\db\config\Connection;
+
 try {
     $pdo = Connection::Connect();
 
@@ -19,6 +21,7 @@ try {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             demanda_id INTEGER NOT NULL,
             fornecedor_id INTEGER NOT NULL,
+            created_at DATETIME NOT NULL,
             FOREIGN KEY (demanda_id) REFERENCES demandas(id),
             FOREIGN KEY (fornecedor_id) REFERENCES fornecedores(id)
         );
