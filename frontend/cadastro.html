@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Demanda e Fornecedor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Cadastro de Demanda</h1>
+    <form id="formDemanda">
+        <input type="text" name="demandaTituloInput" id="demandaTituloInput" placeholder="Titulo da Demanda"
+            required><br>
+        <input type="text" name="demandaCepinput" id="demandaCepinput" placeholder="CEP da Demanda" required><br>
+        <button type="submit">Cadastrar Demanda</button>
+    </form>
+
+    <h1>Cadastro de Fornecedor</h1>
+    <form id="formFornecedor">
+        <input type="text" name="fornecedorRazaoSocialInput" id="fornecedorRazaoSocialInput"
+            placeholder="Razão Social do Fornecedor" required><br>
+        <input type="text" name="fornecedorCepInput" id="fornecedorCepInput" placeholder="CEP do Fornecedor"
+            required><br>
+        <button type="submit">Cadastrar Fornecedor</button>
+    </form>
+
+    <a href="associacao.html">
+        <button>Atribuir fornecedores a uma demanda</button>
+    </a>
+
+    <script>
+        document.getElementById('formDemanda').onsubmit = async (e) => {
+            e.preventDefault();
+
+            let demandaFormData = {
+                titulo: document.getElementById('demandaTituloInput').value,
+                cep: document.getElementById('demandaCepinput').value
+            }
+
+            let response = await fetch('http://localhost:8000/routes/demandas.php', {
+                method: 'POST',
+                body: JSON.stringify(demandaFormData)
+            });
+
+            if (response.status == 200) {
+
+                alert('Demanda cadastrada com sucesso!');
+            } else {
+                alert(response.json.error);
+            }
+
+            e.target.reset();
+        };
+
+        document.getElementById('formFornecedor').onsubmit = async (e) => {
+            e.preventDefault();
+
+            let fornecedorFormData = {
+                razao_social: document.getElementById('fornecedorRazaoSocialInput').value,
+                cep: document.getElementById('fornecedorCepInput').value,
+            }
+
+            let response = await fetch('http://localhost:8000/routes/fornecedores.php', {
+                method: 'POST',
+                body: fornecedorFormData
+            });
+
+            if (response.status == 200) {
+
+                alert('Fornecedor cadastrado com sucesso!');
+            } else {
+                alert(response.json.error);
+            }
+
+            e.target.reset();
+        };
+    </script>
+
+</body>
+
+</html>
